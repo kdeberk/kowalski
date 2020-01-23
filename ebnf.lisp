@@ -4,14 +4,15 @@
 
 (in-package #:kowalski/ebnf)
 
-;; TODO: Move these three to some utils package
-(defun to-string (&rest args)
-  (with-output-to-string (s)
-    (dolist (a args)
-      (princ a s))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  ;; TODO: Move these three to some utils package
+  (defun to-string (&rest args)
+    (with-output-to-string (s)
+      (dolist (a args)
+	(princ a s))))
 
-(defun to-symbol (&rest args)
-  (values (intern (apply #'to-string args))))
+  (defun to-symbol (&rest args)
+    (values (intern (apply #'to-string args)))))
 
 (defun is-surrounded-with (string ch)
   (and (char= ch (char string 0))
@@ -39,7 +40,7 @@
 
 (defmacro read-method (keyword &body body)
   (let ((fname (to-symbol "READ-" keyword)))
-    `(setf (symbol-function ',fname)
+    `(setf (fdefinition ',fname)
            (lambda ()
              (let ((current-stream +stream+))
                (let ((result ,@body))
